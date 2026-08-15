@@ -1,0 +1,14 @@
+.gradle/
+.idea/
+.vscode/
+build/
+run/
+out/
+*.iml
+
+# Local developer environment
+.envrc
+
+# OS files
+.DS_Store
+Thumbs.db

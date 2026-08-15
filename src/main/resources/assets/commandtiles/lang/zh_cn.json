@@ -1,0 +1,9 @@
+{
+  "key.category.commandtiles.main": "CommandTiles",
+  "key.commandtiles.open_menu": "打开 CommandTiles",
+  "screen.commandtiles.menu.title": "CommandTiles",
+  "screen.commandtiles.menu.empty": "还没有快捷指令按钮",
+  "screen.commandtiles.menu.settings": "设置",
+  "screen.commandtiles.settings.title": "CommandTiles 设置",
+  "screen.commandtiles.settings.placeholder": "设置选项将在下一开发阶段加入"
+}

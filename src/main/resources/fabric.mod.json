@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "id": "commandtiles",
+  "version": "${version}",
+  "name": "CommandTiles",
+  "description": "Create and run configurable command buttons from an in-game menu.",
+  "authors": [
+    "River_tao"
+  ],
+  "license": "GPL-3.0-only",
+  "contact": {
+    "homepage": "https://github.com/Rivertao1/CommandTiles",
+    "sources": "https://github.com/Rivertao1/CommandTiles",
+    "issues": "https://github.com/Rivertao1/CommandTiles/issues"
+  },
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "dev.rivertao.commandtiles.CommandTilesClient"
+    ],
+    "modmenu": [
+      "dev.rivertao.commandtiles.compat.modmenu.ModMenuIntegration"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.18.4",
+    "fabric-api": "*",
+    "java": ">=21",
+    "minecraft": "1.21.11"
+  },
+  "suggests": {
+    "modmenu": ">=17.0.0-alpha.1"
+  },
+  "custom": {
+    "modmenu": {
+      "badges": [
+        "client"
+      ]
+    }
+  }
+}
