@@ -10,6 +10,7 @@ package dev.rivertao.commandtiles;
 import com.mojang.blaze3d.platform.InputConstants;
 import dev.rivertao.commandtiles.config.ConfigManager;
 import dev.rivertao.commandtiles.execution.CommandExecutor;
+import dev.rivertao.commandtiles.execution.ShortcutManager;
 import dev.rivertao.commandtiles.gui.CommandTilesScreen;
 import dev.rivertao.commandtiles.gui.SettingsScreen;
 import net.fabricmc.api.ClientModInitializer;
@@ -18,6 +19,8 @@ import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.resources.Identifier;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
@@ -29,6 +32,7 @@ public final class CommandTilesClient implements ClientModInitializer {
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_NAME);
     private static ConfigManager configManager;
     private static final CommandExecutor COMMAND_EXECUTOR = new CommandExecutor();
+    private static final ShortcutManager SHORTCUT_MANAGER = new ShortcutManager();
 
     private static final KeyMapping.Category KEY_CATEGORY = KeyMapping.Category.register(
             Identifier.fromNamespaceAndPath(MOD_ID, "main")
@@ -51,8 +55,13 @@ public final class CommandTilesClient implements ClientModInitializer {
 
     private static void onEndClientTick(Minecraft client) {
         while (OPEN_MENU_KEY.consumeClick()) {
-            client.setScreen(new CommandTilesScreen(client.screen));
+            if (client.screen == null) {
+                client.setScreen(new CommandTilesScreen(null));
+            } else if (client.screen instanceof CommandTilesScreen commandTilesScreen) {
+                commandTilesScreen.onClose();
+            }
         }
+        SHORTCUT_MANAGER.tick(client);
         COMMAND_EXECUTOR.tick(client);
     }
 
@@ -69,6 +78,14 @@ public final class CommandTilesClient implements ClientModInitializer {
 
     public static CommandExecutor commandExecutor() {
         return COMMAND_EXECUTOR;
+    }
+
+    public static boolean matchesMenuKey(KeyEvent event) {
+        return OPEN_MENU_KEY.matches(event);
+    }
+
+    public static boolean matchesMenuKey(MouseButtonEvent event) {
+        return OPEN_MENU_KEY.matchesMouse(event);
     }
 
 }

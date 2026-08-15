@@ -22,9 +22,10 @@ import net.minecraft.network.chat.Component;
 import java.util.List;
 
 public final class CommandTilesScreen extends Screen {
-    private static final int GAP = 4;
-    private static final int TILE_HEIGHT = 24;
-    private static final int FOOTER_BUTTON_WIDTH = 90;
+    private static final int GAP = 5;
+    private static final int TILE_HEIGHT = 44;
+    private static final int PREFERRED_TILE_WIDTH = 138;
+    private static final int MIN_TILE_WIDTH = 104;
 
     private final Screen parent;
     private boolean editMode;
@@ -44,47 +45,58 @@ public final class CommandTilesScreen extends Screen {
                 ? group.tiles()
                 : group.tiles().stream().filter(CommandTile::visible).toList();
 
-        int columns = Math.max(1, Math.min(settings.buttonsPerRow(), width / 72));
-        int rows = Math.max(1, Math.min(settings.visibleRows(), Math.max(1, (height - 94) / (TILE_HEIGHT + GAP))));
+        int availableColumns = Math.max(1, (width - 24 + GAP) / (MIN_TILE_WIDTH + GAP));
+        int columns = Math.max(1, Math.min(settings.buttonsPerRow(), availableColumns));
+        int rows = Math.max(1, Math.min(
+                settings.visibleRows(),
+                Math.max(1, (height - 78) / (TILE_HEIGHT + GAP))
+        ));
         int pageSize = columns * rows;
-        int pageCount = Math.max(1, (tiles.size() + pageSize - 1) / pageSize);
+        int entryCount = tiles.size() + (editMode ? 1 : 0);
+        int pageCount = Math.max(1, (entryCount + pageSize - 1) / pageSize);
         page = Math.clamp(page, 0, pageCount - 1);
 
-        addRenderableWidget(new StringWidget(
-                width / 2 - 150,
-                10,
-                300,
-                20,
-                Component.literal(profile.name() + " / " + group.name()),
-                font
-        ));
+        Component heading = editMode
+                ? Component.translatable("screen.commandtiles.menu.editing_heading", profile.name(), group.name())
+                : Component.literal(profile.name() + " / " + group.name());
+        addRenderableWidget(new StringWidget(width / 2 - 180, 8, 360, 20, heading, font));
 
-        int gridWidth = Math.min(width - 24, columns * 120 + (columns - 1) * GAP);
+        int gridWidth = Math.min(width - 24, columns * PREFERRED_TILE_WIDTH + (columns - 1) * GAP);
         int tileWidth = (gridWidth - (columns - 1) * GAP) / columns;
         int gridX = (width - gridWidth) / 2;
-        int gridY = 36;
-        int firstTile = page * pageSize;
-        int lastTile = Math.min(tiles.size(), firstTile + pageSize);
+        int gridY = 32;
+        int firstEntry = page * pageSize;
+        int lastEntry = Math.min(entryCount, firstEntry + pageSize);
 
-        for (int index = firstTile; index < lastTile; index++) {
-            CommandTile tile = tiles.get(index);
-            int position = index - firstTile;
+        for (int index = firstEntry; index < lastEntry; index++) {
+            int position = index - firstEntry;
             int x = gridX + (position % columns) * (tileWidth + GAP);
             int y = gridY + (position / columns) * (TILE_HEIGHT + GAP);
-            Button button = Button.builder(Component.literal(tile.name()), ignored -> {
-                if (editMode) {
-                    openTile(group, tile);
-                } else {
-                    execute(tile, settings);
-                }
-            })
-                    .pos(x, y)
-                    .size(tileWidth, TILE_HEIGHT)
-                    .build();
-            addRenderableWidget(button);
+            if (index < tiles.size()) {
+                CommandTile tile = tiles.get(index);
+                addRenderableWidget(new CommandTileWidget(
+                        x,
+                        y,
+                        tileWidth,
+                        TILE_HEIGHT,
+                        tile,
+                        editMode,
+                        () -> {
+                            if (editMode) {
+                                openTile(group, tile);
+                            } else {
+                                execute(tile, settings);
+                            }
+                        }
+                ));
+            } else {
+                addRenderableWidget(new AddTileWidget(
+                        x, y, tileWidth, TILE_HEIGHT, () -> openTile(group, null)
+                ));
+            }
         }
 
-        if (tiles.isEmpty()) {
+        if (tiles.isEmpty() && !editMode) {
             addRenderableWidget(new StringWidget(
                     width / 2 - 150,
                     gridY + 16,
@@ -96,38 +108,33 @@ public final class CommandTilesScreen extends Screen {
         }
 
         int footerY = height - 28;
-        int footerX = width / 2 - 2 * FOOTER_BUTTON_WIDTH - 6;
-        addRenderableWidget(Button.builder(
-                Component.translatable(editMode ? "screen.commandtiles.menu.finish_editing" : "screen.commandtiles.menu.edit"),
-                ignored -> {
-                    editMode = !editMode;
-                    page = 0;
-                    rebuildWidgets();
-                }
-        ).pos(footerX, footerY).size(FOOTER_BUTTON_WIDTH, 20).build());
-
-        Button addButton = Button.builder(
-                Component.translatable("screen.commandtiles.menu.add"),
-                ignored -> openTile(group, null)
-        ).pos(footerX + FOOTER_BUTTON_WIDTH + GAP, footerY).size(FOOTER_BUTTON_WIDTH, 20).build();
-        addButton.active = editMode;
-        addRenderableWidget(addButton);
-
-        addRenderableWidget(Button.builder(
-                Component.translatable("screen.commandtiles.menu.settings"),
-                ignored -> Minecraft.getInstance().setScreen(CommandTilesClient.createConfigScreen(this))
-        ).pos(footerX + 2 * (FOOTER_BUTTON_WIDTH + GAP), footerY).size(FOOTER_BUTTON_WIDTH, 20).build());
-        addRenderableWidget(Button.builder(CommonComponents.GUI_DONE, ignored -> onClose())
-                .pos(footerX + 3 * (FOOTER_BUTTON_WIDTH + GAP), footerY)
-                .size(FOOTER_BUTTON_WIDTH, 20)
-                .build());
+        if (editMode) {
+            addRenderableWidget(Button.builder(
+                    Component.translatable("screen.commandtiles.menu.finish_editing"),
+                    ignored -> setEditMode(false)
+            ).pos(width / 2 - 75, footerY).size(150, 20).build());
+        } else {
+            int buttonWidth = Math.min(100, (width - 28) / 3);
+            int footerWidth = buttonWidth * 3 + GAP * 2;
+            int footerX = (width - footerWidth) / 2;
+            addRenderableWidget(Button.builder(
+                    Component.translatable("screen.commandtiles.menu.edit"),
+                    ignored -> setEditMode(true)
+            ).pos(footerX, footerY).size(buttonWidth, 20).build());
+            addRenderableWidget(Button.builder(
+                    Component.translatable("screen.commandtiles.menu.settings"),
+                    ignored -> Minecraft.getInstance().setScreen(CommandTilesClient.createConfigScreen(this))
+            ).pos(footerX + buttonWidth + GAP, footerY).size(buttonWidth, 20).build());
+            addRenderableWidget(Button.builder(CommonComponents.GUI_DONE, ignored -> onClose())
+                    .pos(footerX + 2 * (buttonWidth + GAP), footerY)
+                    .size(buttonWidth, 20)
+                    .build());
+        }
 
         if (pageCount > 1) {
-            int navigationY = footerY - 24;
-            Button previous = Button.builder(Component.literal("<"), ignored -> {
-                page--;
-                rebuildWidgets();
-            }).pos(width / 2 - 70, navigationY).size(30, 20).build();
+            int navigationY = footerY - 23;
+            Button previous = Button.builder(Component.literal("<"), ignored -> changePage(-1))
+                    .pos(width / 2 - 70, navigationY).size(30, 20).build();
             previous.active = page > 0;
             addRenderableWidget(previous);
             addRenderableWidget(new StringWidget(
@@ -138,13 +145,22 @@ public final class CommandTilesScreen extends Screen {
                     Component.translatable("screen.commandtiles.menu.page", page + 1, pageCount),
                     font
             ));
-            Button next = Button.builder(Component.literal(">"), ignored -> {
-                page++;
-                rebuildWidgets();
-            }).pos(width / 2 + 40, navigationY).size(30, 20).build();
+            Button next = Button.builder(Component.literal(">"), ignored -> changePage(1))
+                    .pos(width / 2 + 40, navigationY).size(30, 20).build();
             next.active = page + 1 < pageCount;
             addRenderableWidget(next);
         }
+    }
+
+    private void setEditMode(boolean editMode) {
+        this.editMode = editMode;
+        page = 0;
+        rebuildWidgets();
+    }
+
+    private void changePage(int change) {
+        page += change;
+        rebuildWidgets();
     }
 
     private void openTile(TileGroup group, CommandTile tile) {

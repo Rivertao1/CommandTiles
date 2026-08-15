@@ -19,6 +19,7 @@ public final class CommandTile {
     private boolean visible = true;
     private Boolean closeMenuOverride;
     private ExecutionMode executionMode = ExecutionMode.SEND;
+    private KeyChord keyBinding = new KeyChord();
     private List<CommandStep> steps = new ArrayList<>();
 
     public String id() {
@@ -49,6 +50,10 @@ public final class CommandTile {
         return executionMode;
     }
 
+    public KeyChord keyBinding() {
+        return keyBinding;
+    }
+
     public List<CommandStep> steps() {
         return steps;
     }
@@ -77,6 +82,10 @@ public final class CommandTile {
         this.executionMode = executionMode;
     }
 
+    public void setKeyBinding(KeyChord keyBinding) {
+        this.keyBinding = keyBinding;
+    }
+
     void validate(Set<String> usedIds) {
         id = ConfigIds.unique(id, usedIds);
         name = ConfigIds.displayName(name, "New tile");
@@ -89,6 +98,10 @@ public final class CommandTile {
         if (executionMode == null) {
             executionMode = ExecutionMode.SEND;
         }
+        if (keyBinding == null) {
+            keyBinding = new KeyChord();
+        }
+        keyBinding.validate();
         if (steps == null) {
             steps = new ArrayList<>();
         }

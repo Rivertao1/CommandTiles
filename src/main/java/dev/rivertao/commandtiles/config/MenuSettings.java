@@ -13,7 +13,7 @@ public final class MenuSettings {
     private static final int MIN_VISIBLE_ROWS = 1;
     private static final int MAX_VISIBLE_ROWS = 10;
 
-    private int buttonsPerRow = 5;
+    private int buttonsPerRow = 4;
     private int visibleRows = 3;
     private boolean closeOnAction = true;
     private boolean showExecutionMessage = true;
