@@ -30,12 +30,5 @@
   },
   "suggests": {
     "modmenu": ">=17.0.0-alpha.1"
-  },
-  "custom": {
-    "modmenu": {
-      "badges": [
-        "client"
-      ]
-    }
   }
 }

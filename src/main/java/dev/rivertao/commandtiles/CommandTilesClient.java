@@ -53,6 +53,4 @@ public final class CommandTilesClient implements ClientModInitializer {
         return new SettingsScreen(parent);
     }
 
-    private CommandTilesClient() {
-    }
 }
