@@ -8,6 +8,8 @@
 package dev.rivertao.commandtiles;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import dev.rivertao.commandtiles.config.ConfigManager;
+import dev.rivertao.commandtiles.execution.CommandExecutor;
 import dev.rivertao.commandtiles.gui.CommandTilesScreen;
 import dev.rivertao.commandtiles.gui.SettingsScreen;
 import net.fabricmc.api.ClientModInitializer;
@@ -25,6 +27,8 @@ public final class CommandTilesClient implements ClientModInitializer {
     public static final String MOD_ID = "commandtiles";
     public static final String MOD_NAME = "CommandTiles";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_NAME);
+    private static ConfigManager configManager;
+    private static final CommandExecutor COMMAND_EXECUTOR = new CommandExecutor();
 
     private static final KeyMapping.Category KEY_CATEGORY = KeyMapping.Category.register(
             Identifier.fromNamespaceAndPath(MOD_ID, "main")
@@ -38,19 +42,33 @@ public final class CommandTilesClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+        configManager = new ConfigManager();
+        configManager.load();
         KeyBindingHelper.registerKeyBinding(OPEN_MENU_KEY);
         ClientTickEvents.END_CLIENT_TICK.register(CommandTilesClient::onEndClientTick);
-        LOGGER.info("Initialized {}", MOD_NAME);
+        LOGGER.info("Initialized {} with config at {}", MOD_NAME, configManager.configFile());
     }
 
     private static void onEndClientTick(Minecraft client) {
         while (OPEN_MENU_KEY.consumeClick()) {
             client.setScreen(new CommandTilesScreen(client.screen));
         }
+        COMMAND_EXECUTOR.tick(client);
     }
 
     public static Screen createConfigScreen(Screen parent) {
         return new SettingsScreen(parent);
+    }
+
+    public static ConfigManager configManager() {
+        if (configManager == null) {
+            throw new IllegalStateException("CommandTiles has not been initialized");
+        }
+        return configManager;
+    }
+
+    public static CommandExecutor commandExecutor() {
+        return COMMAND_EXECUTOR;
     }
 
 }
