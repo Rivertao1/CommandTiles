@@ -4,6 +4,7 @@
   "version": "${version}",
   "name": "CommandTiles",
   "description": "Create and run configurable command buttons from an in-game menu.",
+  "icon": "assets/commandtiles/icon.png",
   "authors": [
     "River_tao"
   ],

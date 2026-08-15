@@ -1,38 +1,70 @@
 # CommandTiles
 
-CommandTiles is a client-side Fabric mod for creating and running configurable command buttons
-from an in-game menu.
+CommandTiles is a client-side Fabric mod that lets you create command buttons in game and run
+them from a compact menu or an optional keyboard shortcut.
 
-> [!IMPORTANT]
-> CommandTiles is in early development. The current `0.1.0` build provides the Fabric project
-> foundation and placeholder screens; command-tile editing and execution are not implemented yet.
+The first alpha release targets Minecraft 1.21.11.
 
-The initial target is Minecraft 1.21.11. Support for more Minecraft versions may be added later.
+## Features
 
-## Planned Features
+- Open a configurable command-tile menu with `G` by default.
+- Create, edit, and delete tiles without editing configuration files.
+- Give each tile a name, description, Minecraft item icon, command or chat message, and delay.
+- Run tiles from the menu or assign an optional keyboard, modifier-key, or mouse shortcut.
+- Warn about vanilla key conflicts and prevent duplicate CommandTiles shortcuts.
+- Configure the grid size, execution feedback, and whether the menu closes after an action.
+- Recover safely from unreadable configuration files and keep a backup when saving.
+- Use the Mod Menu configuration button when Mod Menu is installed.
+- English and Simplified Chinese translations.
 
-- A configurable grid of command buttons opened with one key.
-- Complete in-game editing, including item icons and ordered action lists.
-- Multiple commands or chat messages per tile with individual delays.
-- Profiles, groups, placeholders, and additional execution modes in later versions.
-- Optional Mod Menu integration without making Mod Menu a required dependency.
+## Requirements
+
+- Minecraft 1.21.11
+- Fabric Loader 0.18.4 or newer
+- Fabric API 0.139.4+1.21.11 or a compatible newer build
+- Java 21
+- Mod Menu 17.0.0-alpha.1 or newer is optional
+
+## Installation
+
+1. Install Fabric Loader for Minecraft 1.21.11.
+2. Put Fabric API and the CommandTiles JAR in the Minecraft `mods` directory.
+3. Optionally install Mod Menu.
+4. Start the game and press `G` while in a world.
+
+## Usage
+
+1. Open CommandTiles with `G`.
+2. Select **Edit**, then select the green **Add tile** card.
+3. Enter a name and an action. Text beginning with `/` is sent as a command; other text is sent
+   as a chat message.
+4. Optionally choose an item ID, delay, and shortcut.
+5. Save the tile and leave edit mode to run it.
+
+When listening for a shortcut, press `Escape` to cancel or `Backspace`/`Delete` to clear the
+binding. Shortcuts only run while playing with no other screen open.
+
+Configuration is stored in `.minecraft/config/commandtiles/config.json`.
+
+## Alpha Limitations
+
+- The in-game editor currently exposes one action per tile. The configuration and executor
+  already support ordered action lists, and a full list editor is planned.
+- Profile and group data exists, but profile/group management screens are not implemented yet.
+- Tile drag-and-drop reordering is not implemented.
+- Only Fabric 1.21.11 is currently supported.
 
 ## Development
 
-- Java 21
-- Gradle 9.2.1
-- Fabric Loom 1.14.4
-- Fabric Loader 0.18.4
-- Fabric API 0.139.4+1.21.11
-- Mod Menu 17.0.0-alpha.1 (optional at runtime)
-
-Build with:
+Build the project with Java 21:
 
 ```shell
 ./gradlew build
 ```
 
-The development client can be launched with:
+The distributable JAR is written to `build/libs/`.
+
+Launch the development client with:
 
 ```shell
 ./gradlew runClient
