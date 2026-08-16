@@ -12,6 +12,7 @@ The first alpha release targets Minecraft 1.21.11.
 - Give each tile a name, description, Minecraft item icon, command or chat message, and delay.
 - Run tiles from the menu or assign an optional keyboard, modifier-key, or mouse shortcut.
 - Warn about vanilla key conflicts and prevent duplicate CommandTiles shortcuts.
+- Show and edit CommandTiles shortcuts in Visual Keymap when it is installed.
 - Configure the grid size, execution feedback, and whether the menu closes after an action.
 - Recover safely from unreadable configuration files and keep a backup when saving.
 - Use the Mod Menu configuration button when Mod Menu is installed.
@@ -24,6 +25,7 @@ The first alpha release targets Minecraft 1.21.11.
 - Fabric API 0.139.4+1.21.11 or a compatible newer build
 - Java 21
 - Mod Menu 17.0.0-alpha.1 or newer is optional
+- Visual Keymap 1.4.0 or newer is optional
 
 ## Installation
 
@@ -42,7 +44,9 @@ The first alpha release targets Minecraft 1.21.11.
 5. Save the tile and leave edit mode to run it.
 
 When listening for a shortcut, press `Escape` to cancel or `Backspace`/`Delete` to clear the
-binding. Shortcuts only run while playing with no other screen open.
+binding. Press and release Ctrl, Shift, Alt, or Super to bind that modifier by itself; hold it and
+press another key to create a combination. Shortcuts only run while playing with no other screen
+open.
 
 Configuration is stored in `.minecraft/config/commandtiles/config.json`.
 

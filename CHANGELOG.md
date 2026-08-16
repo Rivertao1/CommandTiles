@@ -2,6 +2,18 @@
 
 All notable changes to CommandTiles are documented in this file.
 
+## 0.1.0-alpha.2 - 2026-08-16
+
+### Added
+
+- Optional Visual Keymap integration for viewing and editing CommandTiles shortcuts.
+- Support for binding Ctrl, Shift, Alt, or Super as a standalone shortcut by pressing and
+  releasing the modifier key.
+
+### Changed
+
+- Updated Fabric Loom to 1.15.5 for compatibility with the Visual Keymap 1.21.11 artifact.
+
 ## 0.1.0-alpha.1 - 2026-08-15
 
 First public alpha release for Fabric 1.21.11.

@@ -67,10 +67,11 @@ public final class KeyChord {
     }
 
     public boolean isDown(Window window) {
-        if (!isBound() || currentModifiers(window) != modifiers) {
+        InputConstants.Key key = key();
+        int mainModifier = modifierMask(key);
+        if (!isBound() || (currentModifiers(window) & ~mainModifier) != modifiers) {
             return false;
         }
-        InputConstants.Key key = key();
         if (key.getType() == InputConstants.Type.MOUSE) {
             return GLFW.glfwGetMouseButton(window.handle(), key.getValue()) == GLFW.GLFW_PRESS;
         }
@@ -81,10 +82,6 @@ public final class KeyChord {
         InputConstants.Key parsed = key();
         keyName = parsed.getName();
         modifiers &= SUPPORTED_MODIFIERS;
-        if (isModifierKey(parsed)) {
-            keyName = InputConstants.UNKNOWN.getName();
-            modifiers = 0;
-        }
     }
 
     public static boolean isModifierKey(InputConstants.Key key) {
@@ -97,6 +94,19 @@ public final class KeyChord {
                  InputConstants.KEY_LSHIFT, InputConstants.KEY_RSHIFT,
                  InputConstants.KEY_LSUPER, InputConstants.KEY_RSUPER -> true;
             default -> false;
+        };
+    }
+
+    public static int modifierMask(InputConstants.Key key) {
+        if (key.getType() != InputConstants.Type.KEYSYM) {
+            return 0;
+        }
+        return switch (key.getValue()) {
+            case InputConstants.KEY_LCONTROL, InputConstants.KEY_RCONTROL -> InputConstants.MOD_CONTROL;
+            case InputConstants.KEY_LALT, InputConstants.KEY_RALT -> InputConstants.MOD_ALT;
+            case InputConstants.KEY_LSHIFT, InputConstants.KEY_RSHIFT -> InputConstants.MOD_SHIFT;
+            case InputConstants.KEY_LSUPER, InputConstants.KEY_RSUPER -> InputConstants.MOD_SUPER;
+            default -> 0;
         };
     }
 

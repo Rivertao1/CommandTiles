@@ -28,6 +28,7 @@
   "screen.commandtiles.tile_editor.keybind_value": "%s",
   "screen.commandtiles.keybind.unbound": "未绑定",
   "screen.commandtiles.keybind.listening": "请按下按键或鼠标键……",
+  "screen.commandtiles.keybind.modifier_pending": "%s + ……（松开以绑定单键）",
   "screen.commandtiles.tile_editor.keybind_conflict_internal": "已被“%s”使用",
   "screen.commandtiles.tile_editor.keybind_conflict_vanilla": "同时被 Minecraft 使用：%s",
   "screen.commandtiles.tile_editor.keybind_conflict_menu": "这个按键用于打开 CommandTiles，请选择其他按键",

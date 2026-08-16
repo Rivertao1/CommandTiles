@@ -21,6 +21,9 @@
     ],
     "modmenu": [
       "dev.rivertao.commandtiles.compat.modmenu.ModMenuIntegration"
+    ],
+    "visualkeymap": [
+      "dev.rivertao.commandtiles.compat.visualkeymap.VisualKeymapIntegration"
     ]
   },
   "depends": {
@@ -30,6 +33,7 @@
     "minecraft": "1.21.11"
   },
   "suggests": {
-    "modmenu": ">=17.0.0-alpha.1"
+    "modmenu": ">=17.0.0-alpha.1",
+    "visual-keymap": ">=1.4.0"
   }
 }

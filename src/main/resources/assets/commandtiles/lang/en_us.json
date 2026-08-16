@@ -28,6 +28,7 @@
   "screen.commandtiles.tile_editor.keybind_value": "%s",
   "screen.commandtiles.keybind.unbound": "Unbound",
   "screen.commandtiles.keybind.listening": "Press a key or mouse button…",
+  "screen.commandtiles.keybind.modifier_pending": "%s + … (release for single key)",
   "screen.commandtiles.tile_editor.keybind_conflict_internal": "Already used by ‘%s’",
   "screen.commandtiles.tile_editor.keybind_conflict_vanilla": "Also used by Minecraft: %s",
   "screen.commandtiles.tile_editor.keybind_conflict_menu": "This key opens CommandTiles; choose another key",

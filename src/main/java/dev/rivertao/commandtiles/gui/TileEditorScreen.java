@@ -46,6 +46,8 @@ public final class TileEditorScreen extends Screen {
     private StringWidget errorWidget;
     private KeyChord keyBinding;
     private boolean listeningForKey;
+    private InputConstants.Key pendingModifierKey;
+    private int pendingModifierModifiers;
     private Component errorMessage;
 
     public TileEditorScreen(Screen parent, TileGroup group, CommandTile tile) {
@@ -177,16 +179,17 @@ public final class TileEditorScreen extends Screen {
 
     private void beginListening() {
         listeningForKey = true;
+        pendingModifierKey = null;
+        pendingModifierModifiers = 0;
         keyBindingButton.setMessage(Component.translatable("screen.commandtiles.keybind.listening"));
         bindingWarningWidget.setMessage(CommonComponents.EMPTY);
     }
 
     private void acceptBinding(InputConstants.Key key, int modifiers) {
-        if (KeyChord.isModifierKey(key)) {
-            return;
-        }
-        keyBinding = new KeyChord(key, modifiers);
+        keyBinding = new KeyChord(key, modifiers & ~KeyChord.modifierMask(key));
         listeningForKey = false;
+        pendingModifierKey = null;
+        pendingModifierModifiers = 0;
         keyBindingButton.setMessage(bindingLabel());
         bindingWarningWidget.setMessage(bindingWarning());
         setError(CommonComponents.EMPTY);
@@ -195,6 +198,8 @@ public final class TileEditorScreen extends Screen {
     private void clearBinding() {
         keyBinding = new KeyChord();
         listeningForKey = false;
+        pendingModifierKey = null;
+        pendingModifierModifiers = 0;
         keyBindingButton.setMessage(bindingLabel());
         bindingWarningWidget.setMessage(CommonComponents.EMPTY);
         setError(CommonComponents.EMPTY);
@@ -274,6 +279,8 @@ public final class TileEditorScreen extends Screen {
         }
         if (event.key() == InputConstants.KEY_ESCAPE) {
             listeningForKey = false;
+            pendingModifierKey = null;
+            pendingModifierModifiers = 0;
             keyBindingButton.setMessage(bindingLabel());
             bindingWarningWidget.setMessage(bindingWarning());
             return true;
@@ -286,7 +293,30 @@ public final class TileEditorScreen extends Screen {
             setError(Component.translatable("screen.commandtiles.tile_editor.keybind_conflict_menu"));
             return true;
         }
-        acceptBinding(InputConstants.Type.KEYSYM.getOrCreate(event.key()), event.modifiers());
+        InputConstants.Key key = InputConstants.Type.KEYSYM.getOrCreate(event.key());
+        if (KeyChord.isModifierKey(key)) {
+            pendingModifierKey = key;
+            pendingModifierModifiers = event.modifiers() & ~KeyChord.modifierMask(key);
+            keyBindingButton.setMessage(Component.translatable(
+                    "screen.commandtiles.keybind.modifier_pending",
+                    key.getDisplayName()
+            ));
+            return true;
+        }
+        acceptBinding(key, event.modifiers());
+        return true;
+    }
+
+    @Override
+    public boolean keyReleased(KeyEvent event) {
+        if (!listeningForKey || pendingModifierKey == null) {
+            return super.keyReleased(event);
+        }
+        if (pendingModifierKey.getType() == InputConstants.Type.KEYSYM
+                && pendingModifierKey.getValue() == event.key()) {
+            acceptBinding(pendingModifierKey, pendingModifierModifiers);
+            return true;
+        }
         return true;
     }
 
