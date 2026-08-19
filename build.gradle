@@ -20,7 +20,9 @@ sourceSets {
     main {
         // Keep the Fabric implementation available as a reference while the
         // NeoForge port is brought up feature by feature.
-        java.setSrcDirs(["src/neoforge/java"])
+        java.setSrcDirs(["src/main/java", "src/neoforge/java"])
+        java.include("dev/rivertao/commandtiles/CommandTiles.java")
+        java.include("dev/rivertao/commandtiles/config/**")
         resources.exclude("fabric.mod.json")
     }
 }

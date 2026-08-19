@@ -14,10 +14,10 @@ import net.minecraft.network.chat.MutableComponent;
 import org.lwjgl.glfw.GLFW;
 
 public final class KeyChord {
-    public static final int SUPPORTED_MODIFIERS = InputConstants.MOD_SHIFT
-            | InputConstants.MOD_CONTROL
-            | InputConstants.MOD_ALT
-            | InputConstants.MOD_SUPER;
+    public static final int SUPPORTED_MODIFIERS = GLFW.GLFW_MOD_SHIFT
+            | GLFW.GLFW_MOD_CONTROL
+            | GLFW.GLFW_MOD_ALT
+            | GLFW.GLFW_MOD_SUPER;
 
     private String keyName = InputConstants.UNKNOWN.getName();
     private int modifiers;
@@ -59,10 +59,10 @@ public final class KeyChord {
             return Component.translatable("screen.commandtiles.keybind.unbound");
         }
         MutableComponent result = Component.empty();
-        appendModifier(result, InputConstants.MOD_CONTROL, "Ctrl");
-        appendModifier(result, InputConstants.MOD_ALT, "Alt");
-        appendModifier(result, InputConstants.MOD_SHIFT, "Shift");
-        appendModifier(result, InputConstants.MOD_SUPER, "Super");
+        appendModifier(result, GLFW.GLFW_MOD_CONTROL, "Ctrl");
+        appendModifier(result, GLFW.GLFW_MOD_ALT, "Alt");
+        appendModifier(result, GLFW.GLFW_MOD_SHIFT, "Shift");
+        appendModifier(result, GLFW.GLFW_MOD_SUPER, "Super");
         return result.append(key().getDisplayName());
     }
 
@@ -73,9 +73,9 @@ public final class KeyChord {
             return false;
         }
         if (key.getType() == InputConstants.Type.MOUSE) {
-            return GLFW.glfwGetMouseButton(window.handle(), key.getValue()) == GLFW.GLFW_PRESS;
+            return GLFW.glfwGetMouseButton(window.getWindow(), key.getValue()) == GLFW.GLFW_PRESS;
         }
-        return InputConstants.isKeyDown(window, key.getValue());
+        return InputConstants.isKeyDown(window.getWindow(), key.getValue());
     }
 
     void validate() {
@@ -89,10 +89,10 @@ public final class KeyChord {
             return false;
         }
         return switch (key.getValue()) {
-            case InputConstants.KEY_LCONTROL, InputConstants.KEY_RCONTROL,
-                 InputConstants.KEY_LALT, InputConstants.KEY_RALT,
-                 InputConstants.KEY_LSHIFT, InputConstants.KEY_RSHIFT,
-                 InputConstants.KEY_LSUPER, InputConstants.KEY_RSUPER -> true;
+            case GLFW.GLFW_KEY_LEFT_CONTROL, GLFW.GLFW_KEY_RIGHT_CONTROL,
+                 GLFW.GLFW_KEY_LEFT_ALT, GLFW.GLFW_KEY_RIGHT_ALT,
+                 GLFW.GLFW_KEY_LEFT_SHIFT, GLFW.GLFW_KEY_RIGHT_SHIFT,
+                 GLFW.GLFW_KEY_LEFT_SUPER, GLFW.GLFW_KEY_RIGHT_SUPER -> true;
             default -> false;
         };
     }
@@ -102,10 +102,10 @@ public final class KeyChord {
             return 0;
         }
         return switch (key.getValue()) {
-            case InputConstants.KEY_LCONTROL, InputConstants.KEY_RCONTROL -> InputConstants.MOD_CONTROL;
-            case InputConstants.KEY_LALT, InputConstants.KEY_RALT -> InputConstants.MOD_ALT;
-            case InputConstants.KEY_LSHIFT, InputConstants.KEY_RSHIFT -> InputConstants.MOD_SHIFT;
-            case InputConstants.KEY_LSUPER, InputConstants.KEY_RSUPER -> InputConstants.MOD_SUPER;
+            case GLFW.GLFW_KEY_LEFT_CONTROL, GLFW.GLFW_KEY_RIGHT_CONTROL -> GLFW.GLFW_MOD_CONTROL;
+            case GLFW.GLFW_KEY_LEFT_ALT, GLFW.GLFW_KEY_RIGHT_ALT -> GLFW.GLFW_MOD_ALT;
+            case GLFW.GLFW_KEY_LEFT_SHIFT, GLFW.GLFW_KEY_RIGHT_SHIFT -> GLFW.GLFW_MOD_SHIFT;
+            case GLFW.GLFW_KEY_LEFT_SUPER, GLFW.GLFW_KEY_RIGHT_SUPER -> GLFW.GLFW_MOD_SUPER;
             default -> 0;
         };
     }
@@ -118,22 +118,22 @@ public final class KeyChord {
 
     private static int currentModifiers(Window window) {
         int modifiers = 0;
-        if (down(window, InputConstants.KEY_LCONTROL) || down(window, InputConstants.KEY_RCONTROL)) {
-            modifiers |= InputConstants.MOD_CONTROL;
+        if (down(window, GLFW.GLFW_KEY_LEFT_CONTROL) || down(window, GLFW.GLFW_KEY_RIGHT_CONTROL)) {
+            modifiers |= GLFW.GLFW_MOD_CONTROL;
         }
-        if (down(window, InputConstants.KEY_LALT) || down(window, InputConstants.KEY_RALT)) {
-            modifiers |= InputConstants.MOD_ALT;
+        if (down(window, GLFW.GLFW_KEY_LEFT_ALT) || down(window, GLFW.GLFW_KEY_RIGHT_ALT)) {
+            modifiers |= GLFW.GLFW_MOD_ALT;
         }
-        if (down(window, InputConstants.KEY_LSHIFT) || down(window, InputConstants.KEY_RSHIFT)) {
-            modifiers |= InputConstants.MOD_SHIFT;
+        if (down(window, GLFW.GLFW_KEY_LEFT_SHIFT) || down(window, GLFW.GLFW_KEY_RIGHT_SHIFT)) {
+            modifiers |= GLFW.GLFW_MOD_SHIFT;
         }
-        if (down(window, InputConstants.KEY_LSUPER) || down(window, InputConstants.KEY_RSUPER)) {
-            modifiers |= InputConstants.MOD_SUPER;
+        if (down(window, GLFW.GLFW_KEY_LEFT_SUPER) || down(window, GLFW.GLFW_KEY_RIGHT_SUPER)) {
+            modifiers |= GLFW.GLFW_MOD_SUPER;
         }
         return modifiers;
     }
 
     private static boolean down(Window window, int key) {
-        return InputConstants.isKeyDown(window, key);
+        return InputConstants.isKeyDown(window.getWindow(), key);
     }
 }

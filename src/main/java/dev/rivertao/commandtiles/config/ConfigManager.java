@@ -9,8 +9,8 @@ package dev.rivertao.commandtiles.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import dev.rivertao.commandtiles.CommandTilesClient;
-import net.fabricmc.loader.api.FabricLoader;
+import dev.rivertao.commandtiles.CommandTiles;
+import net.neoforged.fml.loading.FMLPaths;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -35,7 +35,7 @@ public final class ConfigManager {
     private CommandTilesConfig config;
 
     public ConfigManager() {
-        this(FabricLoader.getInstance().getConfigDir().resolve(CommandTilesClient.MOD_ID));
+        this(FMLPaths.CONFIGDIR.get().resolve(CommandTiles.MOD_ID));
     }
 
     ConfigManager(Path configDirectory) {
@@ -69,13 +69,13 @@ public final class ConfigManager {
             return config;
         } catch (Exception exception) {
             preserveUnreadableConfig();
-            CommandTilesClient.LOGGER.error("Unable to load {}; using defaults", configFile, exception);
+            CommandTiles.LOGGER.error("Unable to load {}; using defaults", configFile, exception);
             config = new CommandTilesConfig();
             config.validate();
             try {
                 write(false);
             } catch (IOException writeException) {
-                CommandTilesClient.LOGGER.error("Unable to write default config to {}", configFile, writeException);
+                CommandTiles.LOGGER.error("Unable to write default config to {}", configFile, writeException);
             }
             return config;
         }
@@ -140,7 +140,7 @@ public final class ConfigManager {
         try {
             Files.copy(configFile, preserved, StandardCopyOption.COPY_ATTRIBUTES);
         } catch (IOException exception) {
-            CommandTilesClient.LOGGER.error("Unable to preserve unreadable config as {}", preserved, exception);
+            CommandTiles.LOGGER.error("Unable to preserve unreadable config as {}", preserved, exception);
         }
     }
 
