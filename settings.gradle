@@ -1,12 +1,7 @@
 pluginManagement {
     repositories {
         gradlePluginPortal()
-        mavenCentral()
-        maven {
-            name = "Fabric"
-            url = uri("https://maven.fabricmc.net")
-        }
     }
 }
 
-rootProject.name = "CommandTiles"
+rootProject.name = "CommandTiles-NeoForge-1.21.1"
