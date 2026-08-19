@@ -1,5 +1,6 @@
 {
   "key.category.commandtiles.main": "CommandTiles",
+  "key.categories.commandtiles": "CommandTiles",
   "key.commandtiles.open_menu": "Open CommandTiles",
   "screen.commandtiles.menu.title": "CommandTiles",
   "screen.commandtiles.menu.empty": "No command tiles yet",

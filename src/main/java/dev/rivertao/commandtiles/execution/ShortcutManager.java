@@ -7,7 +7,7 @@
  */
 package dev.rivertao.commandtiles.execution;
 
-import dev.rivertao.commandtiles.CommandTilesClient;
+import dev.rivertao.commandtiles.CommandTiles;
 import dev.rivertao.commandtiles.config.CommandTile;
 import net.minecraft.client.Minecraft;
 
@@ -21,7 +21,7 @@ public final class ShortcutManager {
 
     public void tick(Minecraft client) {
         Set<String> activeTileIds = new HashSet<>();
-        CommandTilesClient.configManager().get().activeProfile().groups().forEach(group ->
+        CommandTiles.configManager().get().activeProfile().groups().forEach(group ->
                 group.tiles().forEach(tile -> poll(tile, client, activeTileIds))
         );
         previousState.keySet().retainAll(activeTileIds);
@@ -39,7 +39,7 @@ public final class ShortcutManager {
         boolean down = tile.keyBinding().isDown(client.getWindow());
         boolean wasDown = previousState.put(tile.id(), down) == Boolean.TRUE;
         if (down && !wasDown && client.screen == null && client.player != null && client.getConnection() != null) {
-            CommandTilesClient.commandExecutor().queue(tile, client);
+            CommandTiles.commandExecutor().queue(tile, client);
         }
     }
 }

@@ -7,7 +7,7 @@
  */
 package dev.rivertao.commandtiles.gui;
 
-import dev.rivertao.commandtiles.CommandTilesClient;
+import dev.rivertao.commandtiles.CommandTiles;
 import dev.rivertao.commandtiles.config.CommandTile;
 import dev.rivertao.commandtiles.config.MenuSettings;
 import dev.rivertao.commandtiles.config.Profile;
@@ -38,9 +38,9 @@ public final class CommandTilesScreen extends Screen {
 
     @Override
     protected void init() {
-        Profile profile = CommandTilesClient.configManager().get().activeProfile();
+        Profile profile = CommandTiles.configManager().get().activeProfile();
         TileGroup group = profile.groups().getFirst();
-        MenuSettings settings = CommandTilesClient.configManager().get().settings();
+        MenuSettings settings = CommandTiles.configManager().get().settings();
         List<CommandTile> tiles = editMode
                 ? group.tiles()
                 : group.tiles().stream().filter(CommandTile::visible).toList();
@@ -123,7 +123,7 @@ public final class CommandTilesScreen extends Screen {
             ).pos(footerX, footerY).size(buttonWidth, 20).build());
             addRenderableWidget(Button.builder(
                     Component.translatable("screen.commandtiles.menu.settings"),
-                    ignored -> Minecraft.getInstance().setScreen(CommandTilesClient.createConfigScreen(this))
+                    ignored -> Minecraft.getInstance().setScreen(CommandTiles.createConfigScreen(this))
             ).pos(footerX + buttonWidth + GAP, footerY).size(buttonWidth, 20).build());
             addRenderableWidget(Button.builder(CommonComponents.GUI_DONE, ignored -> onClose())
                     .pos(footerX + 2 * (buttonWidth + GAP), footerY)
@@ -168,7 +168,7 @@ public final class CommandTilesScreen extends Screen {
     }
 
     private void execute(CommandTile tile, MenuSettings settings) {
-        if (!CommandTilesClient.commandExecutor().queue(tile, Minecraft.getInstance())) {
+        if (!CommandTiles.commandExecutor().queue(tile, Minecraft.getInstance())) {
             return;
         }
         boolean closeMenu = tile.closeMenuOverride() == null

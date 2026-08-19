@@ -14,11 +14,10 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
@@ -50,11 +49,11 @@ public final class CommandTileWidget extends AbstractButton {
         this.editing = editing;
         this.onPress = onPress;
 
-        Identifier iconId = Identifier.tryParse(tile.icon());
+        ResourceLocation iconId = ResourceLocation.tryParse(tile.icon());
         boolean invalidIcon = iconId == null || !BuiltInRegistries.ITEM.containsKey(iconId);
         this.icon = invalidIcon
                 ? Items.COMMAND_BLOCK.getDefaultInstance()
-                : BuiltInRegistries.ITEM.getValue(iconId).getDefaultInstance();
+                : BuiltInRegistries.ITEM.get(iconId).getDefaultInstance();
         MutableComponent subtitle = Component.translatable(
                 "screen.commandtiles.menu.action_count",
                 tile.steps().size()
@@ -91,12 +90,12 @@ public final class CommandTileWidget extends AbstractButton {
     }
 
     @Override
-    public void onPress(InputWithModifiers input) {
+    public void onPress() {
         onPress.run();
     }
 
     @Override
-    protected void renderContents(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+    protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         boolean highlighted = isHoveredOrFocused();
         int background = highlighted ? HOVERED_BACKGROUND : editing ? EDITING_BACKGROUND : NORMAL_BACKGROUND;
         int border = highlighted ? HOVERED_BORDER : editing ? EDITING_BORDER : NORMAL_BORDER;

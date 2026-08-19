@@ -23,6 +23,8 @@ sourceSets {
         java.setSrcDirs(["src/main/java", "src/neoforge/java"])
         java.include("dev/rivertao/commandtiles/CommandTiles.java")
         java.include("dev/rivertao/commandtiles/config/**")
+        java.include("dev/rivertao/commandtiles/execution/**")
+        java.include("dev/rivertao/commandtiles/gui/**")
         resources.exclude("fabric.mod.json")
     }
 }

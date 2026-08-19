@@ -8,7 +8,7 @@
 package dev.rivertao.commandtiles.gui;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import dev.rivertao.commandtiles.CommandTilesClient;
+import dev.rivertao.commandtiles.CommandTiles;
 import dev.rivertao.commandtiles.config.CommandStep;
 import dev.rivertao.commandtiles.config.CommandTile;
 import dev.rivertao.commandtiles.config.KeyChord;
@@ -20,11 +20,10 @@ import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.input.KeyEvent;
-import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.client.input.MouseButtonInfo;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import net.neoforged.neoforge.client.settings.KeyModifier;
+import org.lwjgl.glfw.GLFW;
 
 import java.io.IOException;
 
@@ -166,13 +165,13 @@ public final class TileEditorScreen extends Screen {
         }
 
         try {
-            CommandTilesClient.configManager().save();
+            CommandTiles.configManager().save();
             onClose();
         } catch (IOException exception) {
             if (creating) {
                 group.tiles().remove(tile);
             }
-            CommandTilesClient.LOGGER.error("Unable to save command tile", exception);
+            CommandTiles.LOGGER.error("Unable to save command tile", exception);
             setError(Component.translatable("screen.commandtiles.save_failed"));
         }
     }
@@ -231,7 +230,7 @@ public final class TileEditorScreen extends Screen {
         if (!keyBinding.isBound()) {
             return null;
         }
-        return CommandTilesClient.configManager().get().activeProfile().groups().stream()
+        return CommandTiles.configManager().get().activeProfile().groups().stream()
                 .flatMap(candidateGroup -> candidateGroup.tiles().stream())
                 .filter(candidate -> candidate != tile)
                 .filter(candidate -> keyBinding.sameBinding(candidate.keyBinding()))
@@ -244,25 +243,25 @@ public final class TileEditorScreen extends Screen {
             return null;
         }
         for (KeyMapping mapping : Minecraft.getInstance().options.keyMappings) {
-            boolean matches;
-            if (keyBinding.key().getType() == InputConstants.Type.MOUSE) {
-                matches = mapping.matchesMouse(new MouseButtonEvent(
-                        0,
-                        0,
-                        new MouseButtonInfo(keyBinding.key().getValue(), keyBinding.modifiers())
-                ));
-            } else {
-                matches = mapping.matches(new KeyEvent(
-                        keyBinding.key().getValue(),
-                        0,
-                        keyBinding.modifiers()
-                ));
-            }
+            boolean keyMatches = keyBinding.key().getType() == InputConstants.Type.MOUSE
+                    ? mapping.matchesMouse(keyBinding.key().getValue())
+                    : mapping.matches(keyBinding.key().getValue(), 0);
+            boolean matches = keyMatches && matchesModifiers(mapping.getKeyModifier());
             if (matches) {
                 return mapping;
             }
         }
         return null;
+    }
+
+    private boolean matchesModifiers(KeyModifier modifier) {
+        int expected = switch (modifier) {
+            case CONTROL -> GLFW.GLFW_MOD_CONTROL;
+            case SHIFT -> GLFW.GLFW_MOD_SHIFT;
+            case ALT -> GLFW.GLFW_MOD_ALT;
+            case NONE -> 0;
+        };
+        return keyBinding.modifiers() == expected;
     }
 
     private void setError(Component message) {
@@ -273,11 +272,11 @@ public final class TileEditorScreen extends Screen {
     }
 
     @Override
-    public boolean keyPressed(KeyEvent event) {
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (!listeningForKey) {
-            return super.keyPressed(event);
+            return super.keyPressed(keyCode, scanCode, modifiers);
         }
-        if (event.key() == InputConstants.KEY_ESCAPE) {
+        if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
             listeningForKey = false;
             pendingModifierKey = null;
             pendingModifierModifiers = 0;
@@ -285,35 +284,35 @@ public final class TileEditorScreen extends Screen {
             bindingWarningWidget.setMessage(bindingWarning());
             return true;
         }
-        if (event.key() == InputConstants.KEY_BACKSPACE || event.key() == InputConstants.KEY_DELETE) {
+        if (keyCode == GLFW.GLFW_KEY_BACKSPACE || keyCode == GLFW.GLFW_KEY_DELETE) {
             clearBinding();
             return true;
         }
-        if (CommandTilesClient.matchesMenuKey(event)) {
+        if (CommandTiles.matchesMenuKey(keyCode, scanCode)) {
             setError(Component.translatable("screen.commandtiles.tile_editor.keybind_conflict_menu"));
             return true;
         }
-        InputConstants.Key key = InputConstants.Type.KEYSYM.getOrCreate(event.key());
+        InputConstants.Key key = InputConstants.getKey(keyCode, scanCode);
         if (KeyChord.isModifierKey(key)) {
             pendingModifierKey = key;
-            pendingModifierModifiers = event.modifiers() & ~KeyChord.modifierMask(key);
+            pendingModifierModifiers = modifiers & ~KeyChord.modifierMask(key);
             keyBindingButton.setMessage(Component.translatable(
                     "screen.commandtiles.keybind.modifier_pending",
                     key.getDisplayName()
             ));
             return true;
         }
-        acceptBinding(key, event.modifiers());
+        acceptBinding(key, modifiers);
         return true;
     }
 
     @Override
-    public boolean keyReleased(KeyEvent event) {
+    public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
         if (!listeningForKey || pendingModifierKey == null) {
-            return super.keyReleased(event);
+            return super.keyReleased(keyCode, scanCode, modifiers);
         }
         if (pendingModifierKey.getType() == InputConstants.Type.KEYSYM
-                && pendingModifierKey.getValue() == event.key()) {
+                && pendingModifierKey.getValue() == keyCode) {
             acceptBinding(pendingModifierKey, pendingModifierModifiers);
             return true;
         }
@@ -321,15 +320,18 @@ public final class TileEditorScreen extends Screen {
     }
 
     @Override
-    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (!listeningForKey) {
-            return super.mouseClicked(event, doubleClick);
+            return super.mouseClicked(mouseX, mouseY, button);
         }
-        if (CommandTilesClient.matchesMenuKey(event)) {
+        if (CommandTiles.matchesMenuMouseButton(button)) {
             setError(Component.translatable("screen.commandtiles.tile_editor.keybind_conflict_menu"));
             return true;
         }
-        acceptBinding(InputConstants.Type.MOUSE.getOrCreate(event.button()), event.modifiers());
+        acceptBinding(
+                InputConstants.Type.MOUSE.getOrCreate(button),
+                KeyChord.currentModifiers(Minecraft.getInstance().getWindow())
+        );
         return true;
     }
 
@@ -357,11 +359,11 @@ public final class TileEditorScreen extends Screen {
         }
         group.tiles().remove(originalIndex);
         try {
-            CommandTilesClient.configManager().save();
+            CommandTiles.configManager().save();
             Minecraft.getInstance().setScreen(parent);
         } catch (IOException exception) {
             group.tiles().add(originalIndex, tile);
-            CommandTilesClient.LOGGER.error("Unable to delete command tile", exception);
+            CommandTiles.LOGGER.error("Unable to delete command tile", exception);
             errorMessage = Component.translatable("screen.commandtiles.save_failed");
             Minecraft.getInstance().setScreen(this);
         }

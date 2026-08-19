@@ -12,7 +12,6 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.network.chat.Component;
 
 public final class AddTileWidget extends AbstractButton {
@@ -25,12 +24,12 @@ public final class AddTileWidget extends AbstractButton {
     }
 
     @Override
-    public void onPress(InputWithModifiers input) {
+    public void onPress() {
         onPress.run();
     }
 
     @Override
-    protected void renderContents(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+    protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         int background = isHoveredOrFocused() ? 0xEE315A3C : 0xD0243F2C;
         int border = isHoveredOrFocused() ? 0xFFFFFFFF : 0xFF62B678;
         graphics.fill(getX(), getY(), getRight(), getBottom(), background);

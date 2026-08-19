@@ -7,7 +7,7 @@
  */
 package dev.rivertao.commandtiles.gui;
 
-import dev.rivertao.commandtiles.CommandTilesClient;
+import dev.rivertao.commandtiles.CommandTiles;
 import dev.rivertao.commandtiles.config.MenuSettings;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
@@ -29,7 +29,7 @@ public final class SettingsScreen extends Screen {
     public SettingsScreen(Screen parent) {
         super(Component.translatable("screen.commandtiles.settings.title"));
         this.parent = parent;
-        MenuSettings settings = CommandTilesClient.configManager().get().settings();
+        MenuSettings settings = CommandTiles.configManager().get().settings();
         buttonsPerRow = settings.buttonsPerRow();
         visibleRows = settings.visibleRows();
         closeOnAction = settings.closeOnAction();
@@ -92,16 +92,16 @@ public final class SettingsScreen extends Screen {
     }
 
     private void saveAndClose() {
-        MenuSettings settings = CommandTilesClient.configManager().get().settings();
+        MenuSettings settings = CommandTiles.configManager().get().settings();
         settings.setButtonsPerRow(buttonsPerRow);
         settings.setVisibleRows(visibleRows);
         settings.setCloseOnAction(closeOnAction);
         settings.setShowExecutionMessage(showExecutionMessage);
         try {
-            CommandTilesClient.configManager().save();
+            CommandTiles.configManager().save();
             onClose();
         } catch (IOException exception) {
-            CommandTilesClient.LOGGER.error("Unable to save CommandTiles settings", exception);
+            CommandTiles.LOGGER.error("Unable to save CommandTiles settings", exception);
             errorMessage = Component.translatable("screen.commandtiles.save_failed");
             rebuildWidgets();
         }

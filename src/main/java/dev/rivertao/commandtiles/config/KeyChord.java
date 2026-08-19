@@ -116,7 +116,7 @@ public final class KeyChord {
         }
     }
 
-    private static int currentModifiers(Window window) {
+    public static int currentModifiers(Window window) {
         int modifiers = 0;
         if (down(window, GLFW.GLFW_KEY_LEFT_CONTROL) || down(window, GLFW.GLFW_KEY_RIGHT_CONTROL)) {
             modifiers |= GLFW.GLFW_MOD_CONTROL;

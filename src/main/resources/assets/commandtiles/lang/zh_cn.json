@@ -1,5 +1,6 @@
 {
   "key.category.commandtiles.main": "CommandTiles",
+  "key.categories.commandtiles": "CommandTiles",
   "key.commandtiles.open_menu": "打开 CommandTiles",
   "screen.commandtiles.menu.title": "CommandTiles",
   "screen.commandtiles.menu.empty": "还没有快捷指令按钮",

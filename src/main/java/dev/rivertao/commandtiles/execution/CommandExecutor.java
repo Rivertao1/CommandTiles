@@ -7,7 +7,7 @@
  */
 package dev.rivertao.commandtiles.execution;
 
-import dev.rivertao.commandtiles.CommandTilesClient;
+import dev.rivertao.commandtiles.CommandTiles;
 import dev.rivertao.commandtiles.config.CommandStep;
 import dev.rivertao.commandtiles.config.CommandTile;
 import dev.rivertao.commandtiles.config.ExecutionMode;
@@ -78,12 +78,12 @@ public final class CommandExecutor {
             try {
                 send(client, action.content());
                 if (action.lastInBatch()
-                        && CommandTilesClient.configManager().get().settings().showExecutionMessage()) {
+                        && CommandTiles.configManager().get().settings().showExecutionMessage()) {
                     show(client, "message.commandtiles.executed");
                 }
             } catch (RuntimeException exception) {
                 pending.removeIf(candidate -> candidate.batchId() == action.batchId());
-                CommandTilesClient.LOGGER.error("Unable to execute command tile action", exception);
+                CommandTiles.LOGGER.error("Unable to execute command tile action", exception);
                 show(client, "message.commandtiles.execution_failed");
             }
         }
