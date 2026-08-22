@@ -43,6 +43,12 @@ neoForge {
             systemProperty "forge.logging.console.level", "info"
         }
     }
+
+    mods {
+        "${mod_id}" {
+            sourceSet(sourceSets.main)
+        }
+    }
 }
 
 def metadataProperties = [
